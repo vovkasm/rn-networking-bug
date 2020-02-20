@@ -1,42 +1,29 @@
 import React from 'react';
-import {SafeAreaView} from 'react-native';
+import {SafeAreaView, Button} from 'react-native';
 
 export default class App extends React.Component {
-  componentDidMount() {
-    this.getFakeArray(10).forEach((_, index) => {
-      const t0 = new Date().getTime();
-      this.promise().then(() => {
-        const t1 = new Date().getTime();
-        console.log('promise(' + index + ') ->', t1 - t0, 'ms');
-      });
-    });
-
-    this.getFakeArray(10).forEach((_, index) => {
-      const t0 = new Date().getTime();
-      this.fetch(index).then(() => {
-        const t1 = new Date().getTime();
-        console.log('fetch(' + index + ') ->', t1 - t0, 'ms');
-      });
-    });
+  makeRequests() {
+    for (let i = 0; i < 10; i++) {
+      this.oneRequest(i);
+    }
   }
 
-  getFakeArray = (n: number) => {
-    return new Array(n).fill(null);
-  };
-
-  promise = () => {
-    return new Promise(resolve => setTimeout(resolve, 1000));
-  };
-
-  fetch = (i: number) => {
-    return fetch('https://google.com/' + i);
-  };
+  oneRequest(i: number) {
+    const t0 = Date.now();
+    console.log(`[${new Date(t0).toJSON()}] req ${i} start`);
+    fetch(
+      `https://libraries.io/search?order=desc&page=${i +
+        2}&platforms=npm&sort=rank`,
+    ).finally(() => {
+      const t1 = Date.now();
+      console.log(`[${new Date(t1).toJSON()}] req ${i} end dur=${t1 - t0}`);
+    });
+  }
 
   render() {
     return (
       <SafeAreaView>
-        {/*  */}
-        {/*  */}
+        <Button title="Test!" onPress={() => this.makeRequests()} />
       </SafeAreaView>
     );
   }
